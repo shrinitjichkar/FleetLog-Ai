@@ -17,8 +17,8 @@ class VehicleSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def validate_odometer(self, value):
-        if self.instance is not None and value < self.instance.odometer:
-            raise serializers.ValidationError(
-                f"odometer cannot decrease. Current value is {self.instance.odometer}."
-            )
-        return value
+         if self.instance is not None and value < self.instance.odometer:
+             raise serializers.ValidationError(
+                 f"odometer cannot decrease. Current value is {self.instance.odometer}."
+             )
+         return value

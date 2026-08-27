@@ -15,6 +15,23 @@ class InspectionSerializer(serializers.ModelSerializer):
             'remarks', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
+        
+        
+    def validate(self, data):
+        vehicle = data.get('vehicle', getattr(self.instance, 'vehicle', None))
+        inspection_date = data.get('inspection_date', getattr(self.instance, 'inspection_date', None))
+
+        if vehicle and inspection_date:
+            vehicle_created_date = vehicle.created_at.date()
+            if inspection_date < vehicle_created_date:
+                raise serializers.ValidationError({
+                    'inspection_date': f"inspection_date cannot be before the vehicle's created_at date ({vehicle_created_date})."
+                })
+
+        return data    
+        
+        
+        
 
 
 class ChecklistItemSerializer(serializers.ModelSerializer):
