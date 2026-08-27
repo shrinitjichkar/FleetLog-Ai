@@ -9,13 +9,13 @@ from django.shortcuts import get_object_or_404
 from .models import Vehicle
 from .serializers import VehicleSerializer
 
-from rest_framework.permissions import IsAuthenticated
+
 # Create your views here.
 
 
 
 class VehicleListCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    
     def get(self, request):
         vehicles = Vehicle.objects.all()
         serializer = VehicleSerializer(vehicles, many=True)
@@ -30,7 +30,7 @@ class VehicleListCreateView(APIView):
 
 
 class VehicleDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    
     def get(self, request, pk):
         vehicle = get_object_or_404(Vehicle, pk=pk)
         serializer = VehicleSerializer(vehicle)

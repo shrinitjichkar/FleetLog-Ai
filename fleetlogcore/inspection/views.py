@@ -7,11 +7,11 @@ from .models import Inspection, ChecklistItem
 from .serializers import InspectionSerializer, ChecklistItemSerializer
 
 
-from rest_framework.permissions import IsAuthenticated
+
 
 
 class InspectionListCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    
     
     
     def get(self, request):
@@ -28,7 +28,7 @@ class InspectionListCreateView(APIView):
 
 
 class InspectionDetailView(APIView):
-    permission_classes = [IsAuthenticated]
+    
     
     def get(self, request, pk):
         inspection = get_object_or_404(Inspection, pk=pk)
