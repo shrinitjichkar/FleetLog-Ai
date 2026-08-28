@@ -9,12 +9,20 @@ from django.shortcuts import get_object_or_404
 from .models import Vehicle
 from .serializers import VehicleSerializer
 
+from accounts.permissions import IsRenter, IsRenterOrSupervisor
+
 
 # Create your views here.
 
 
 
 class VehicleListCreateView(APIView):
+    
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsRenter()]
+        return []
+    
     
     def get(self, request):
         vehicles = Vehicle.objects.all()
@@ -30,6 +38,12 @@ class VehicleListCreateView(APIView):
 
 
 class VehicleDetailView(APIView):
+    
+    def get_permissions(self):
+        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
+            return [IsRenterOrSupervisor()]
+        return []
+
     
     def get(self, request, pk):
         vehicle = get_object_or_404(Vehicle, pk=pk)

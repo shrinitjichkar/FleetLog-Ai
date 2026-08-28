@@ -6,12 +6,19 @@ from django.shortcuts import get_object_or_404
 from .models import Inspection, ChecklistItem
 from .serializers import InspectionSerializer, ChecklistItemSerializer
 
+from accounts.permissions import IsRenterOrSupervisor, IsSupervisorOrAssessor
+
 
 
 
 
 class InspectionListCreateView(APIView):
     
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsRenterOrSupervisor()]
+        return []
     
     
     def get(self, request):
@@ -28,6 +35,12 @@ class InspectionListCreateView(APIView):
 
 
 class InspectionDetailView(APIView):
+    
+    def get_permissions(self):
+        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
+            return [IsSupervisorOrAssessor()]
+        return []
+
     
     
     def get(self, request, pk):
