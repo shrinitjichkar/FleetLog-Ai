@@ -22,6 +22,7 @@ class User(AbstractUser):
         ('assessor', 'Assessor'),
     ]
 
+
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     tenant = models.ForeignKey(
         Tenant,
