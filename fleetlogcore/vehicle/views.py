@@ -36,15 +36,12 @@ class VehicleListCreateView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class VehicleDetailView(APIView):
-    
     def get_permissions(self):
         if self.request.method in ['PUT', 'PATCH', 'DELETE']:
             return [IsRenterOrSupervisor()]
         return []
 
-    
     def get(self, request, pk):
         vehicle = get_object_or_404(Vehicle, pk=pk)
         serializer = VehicleSerializer(vehicle)
@@ -53,6 +50,14 @@ class VehicleDetailView(APIView):
     def put(self, request, pk):
         vehicle = get_object_or_404(Vehicle, pk=pk)
         serializer = VehicleSerializer(vehicle, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, pk):
+        vehicle = get_object_or_404(Vehicle, pk=pk)
+        serializer = VehicleSerializer(vehicle, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
