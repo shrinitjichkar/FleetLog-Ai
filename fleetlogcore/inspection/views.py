@@ -5,22 +5,15 @@ from django.shortcuts import get_object_or_404
 
 from .models import Inspection, ChecklistItem
 from .serializers import InspectionSerializer, ChecklistItemSerializer
-
-from accounts.permissions import IsRenterOrSupervisor, IsSupervisorOrAssessor
-
-
-
+from accounts.permissions import IsRenterOrSupervisor, IsAssignedAssessorOrSupervisor
 
 
 class InspectionListCreateView(APIView):
-    
-
     def get_permissions(self):
         if self.request.method == 'POST':
             return [IsRenterOrSupervisor()]
         return []
-    
-    
+
     def get(self, request):
         inspections = Inspection.objects.all()
         serializer = InspectionSerializer(inspections, many=True)
@@ -35,21 +28,25 @@ class InspectionListCreateView(APIView):
 
 
 class InspectionDetailView(APIView):
-    
     def get_permissions(self):
         if self.request.method in ['PUT', 'PATCH', 'DELETE']:
-            return [IsSupervisorOrAssessor()]
+            return [IsAssignedAssessorOrSupervisor()]
         return []
 
-    
-    
+    def get_object(self, pk):
+        obj = get_object_or_404(Inspection, pk=pk)
+        for permission in self.get_permissions():
+            if not permission.has_object_permission(self.request, self, obj):
+                self.permission_denied(self.request)
+        return obj
+
     def get(self, request, pk):
         inspection = get_object_or_404(Inspection, pk=pk)
         serializer = InspectionSerializer(inspection)
         return Response(serializer.data)
 
     def put(self, request, pk):
-        inspection = get_object_or_404(Inspection, pk=pk)
+        inspection = self.get_object(pk)
         serializer = InspectionSerializer(inspection, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -57,7 +54,7 @@ class InspectionDetailView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, pk):
-        inspection = get_object_or_404(Inspection, pk=pk)
+        inspection = self.get_object(pk)
         serializer = InspectionSerializer(inspection, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -65,7 +62,7 @@ class InspectionDetailView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
-        inspection = get_object_or_404(Inspection, pk=pk)
+        inspection = self.get_object(pk)
         inspection.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
