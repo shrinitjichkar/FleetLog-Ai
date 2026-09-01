@@ -7,8 +7,12 @@ from .models import Inspection, ChecklistItem
 from .serializers import InspectionSerializer, ChecklistItemSerializer
 from accounts.permissions import IsRenterOrSupervisor, IsAssignedAssessorOrSupervisor
 
+from rest_framework.pagination import PageNumberPagination
+
 
 class InspectionListCreateView(APIView):
+    pagination_class = PageNumberPagination
+    
     def get_permissions(self):
         if self.request.method == 'POST':
             return [IsRenterOrSupervisor()]
@@ -16,9 +20,15 @@ class InspectionListCreateView(APIView):
 
     def get(self, request):
         inspections = Inspection.objects.all()
-        serializer = InspectionSerializer(inspections, many=True)
-        return Response(serializer.data)
+        
+        
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(inspections, request)
+        serializer = InspectionSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
+        
+        
     def post(self, request):
         serializer = InspectionSerializer(data=request.data)
         if serializer.is_valid():

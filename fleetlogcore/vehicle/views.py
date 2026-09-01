@@ -12,11 +12,15 @@ from .serializers import VehicleSerializer
 from accounts.permissions import IsRenter, IsRenterOrSupervisor
 from rest_framework.permissions import IsAuthenticated
 
+from rest_framework.pagination import PageNumberPagination
+
 
 
 
 
 class VehicleListCreateView(APIView):
+    pagination_class = PageNumberPagination
+    
     
     def get_permissions(self):
         if self.request.method == 'POST':
@@ -26,9 +30,13 @@ class VehicleListCreateView(APIView):
     
     def get(self, request):
         vehicles = Vehicle.objects.all()
-        serializer = VehicleSerializer(vehicles, many=True)
-        return Response(serializer.data)
+        
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(vehicles, request)   
+        serializer = VehicleSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
+    
     def post(self, request):
         serializer = VehicleSerializer(data=request.data)
         if serializer.is_valid():
