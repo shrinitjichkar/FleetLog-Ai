@@ -13,7 +13,6 @@ from accounts.permissions import IsRenter, IsRenterOrSupervisor
 from rest_framework.permissions import IsAuthenticated
 
 
-# Create your views here.
 
 
 
