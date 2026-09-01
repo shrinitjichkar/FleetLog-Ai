@@ -28,6 +28,12 @@ class InspectionListCreateView(APIView):
         
         inspection_filter = InspectionFilter(request.query_params, queryset=inspections)
         inspections = inspection_filter.qs
+        
+        search_term = request.query_params.get('search')
+        if search_term:
+            vehicles = vehicles.filter(registration_no__icontains=search_term) | \
+                       vehicles.filter(make__icontains=search_term) | \
+                       vehicles.filter(model__icontains=search_term)
        
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(inspections, request)
