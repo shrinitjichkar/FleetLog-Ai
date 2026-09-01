@@ -14,6 +14,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.pagination import PageNumberPagination
 
+from .filters import VehicleFilter
+
 
 
 
@@ -30,6 +32,10 @@ class VehicleListCreateView(APIView):
     
     def get(self, request):
         vehicles = Vehicle.objects.all()
+        
+        vehicle_filter = VehicleFilter(request.query_params, queryset=vehicles)
+        vehicles = vehicle_filter.qs
+        
         
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(vehicles, request)   
