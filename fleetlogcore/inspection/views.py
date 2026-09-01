@@ -9,6 +9,10 @@ from accounts.permissions import IsRenterOrSupervisor, IsAssignedAssessorOrSuper
 
 from rest_framework.pagination import PageNumberPagination
 
+from .filters import InspectionFilter
+
+
+
 
 class InspectionListCreateView(APIView):
     pagination_class = PageNumberPagination
@@ -22,6 +26,9 @@ class InspectionListCreateView(APIView):
         inspections = Inspection.objects.all()
         
         
+        inspection_filter = InspectionFilter(request.query_params, queryset=inspections)
+        inspections = inspection_filter.qs
+       
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(inspections, request)
         serializer = InspectionSerializer(page, many=True)
