@@ -5,7 +5,8 @@ from django.shortcuts import get_object_or_404
 
 from .models import Inspection, ChecklistItem
 from .serializers import InspectionSerializer, ChecklistItemSerializer
-from accounts.permissions import IsRenterOrSupervisor, IsAssignedAssessorOrSupervisor
+from accounts.permissions import IsRenterOrSupervisor, IsSupervisorOrAssessor
+from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.pagination import PageNumberPagination
 
@@ -53,15 +54,11 @@ class InspectionListCreateView(APIView):
 class InspectionDetailView(APIView):
     def get_permissions(self):
         if self.request.method in ['PUT', 'PATCH', 'DELETE']:
-            return [IsAssignedAssessorOrSupervisor()]
-        return []
+            return [IsSupervisorOrAssessor()]
+        return [IsAuthenticated()]
 
     def get_object(self, pk):
-        obj = get_object_or_404(Inspection, pk=pk)
-        for permission in self.get_permissions():
-            if not permission.has_object_permission(self.request, self, obj):
-                self.permission_denied(self.request)
-        return obj
+        return get_object_or_404(Inspection, pk=pk)
 
     def get(self, request, pk):
         inspection = get_object_or_404(Inspection, pk=pk)
@@ -122,3 +119,7 @@ class ChecklistItemDetailView(APIView):
         item = get_object_or_404(ChecklistItem, pk=pk)
         item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+    
+   
