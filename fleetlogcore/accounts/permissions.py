@@ -43,6 +43,7 @@ class IsAssignedAssessorOrSupervisor(BasePermission):
         )
 
     def has_object_permission(self, request, view, obj):
-        if request.user.role in  ['supervisor','assessor']:
-            return True
-        return obj.assessor_id == request.user.id
+      if request.user.role == 'supervisor':
+       return True
+
+      return obj.assessor_id == request.user.id
