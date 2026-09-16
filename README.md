@@ -2,8 +2,6 @@
 
 A backend API for managing vehicles and vehicle inspections, built with **Django, Django REST Framework, PostgreSQL, JWT authentication, and django-filter**.
 
-The project is being developed phase by phase to understand backend development from the fundamentals rather than starting directly with complex abstractions.
-
 The current implementation covers **project setup, CRUD operations, validation and business rules, JWT authentication, role-based permissions, object-level permissions, search, filtering, and pagination.**
 
 ---
